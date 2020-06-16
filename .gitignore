@@ -1,0 +1,7 @@
+.idea/
+assets/
+out/
+src/META-INF/
+KTBooks.iml
+main.db
+nitrite-explorer-3.1.0.jar
