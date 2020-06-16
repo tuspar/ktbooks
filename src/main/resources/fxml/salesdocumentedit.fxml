@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="711.0" prefWidth="1198.0"
+            xmlns="http://javafx.com/javafx/9.0.1" fx:controller="main.controllers.editors.SalesDocumentEditController">
+    <children>
+        <VBox layoutX="170.0" layoutY="75.0" prefHeight="582.0" prefWidth="1094.0" AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <MenuBar>
+                    <menus>
+                        <Menu mnemonicParsing="false" text="File">
+                            <items>
+                                <MenuItem fx:id="newDocumentButton" mnemonicParsing="false" onAction="#newDocument"
+                                          text="New"/>
+                                <MenuItem fx:id="importButton" mnemonicParsing="false" onAction="#importItemsAction"
+                                          text="Import Items"/>
+                                <MenuItem fx:id="markPaid" disable="true" mnemonicParsing="false"
+                                          onAction="#markPaidAction" text="Mark as Paid"/>
+                                <SeparatorMenuItem mnemonicParsing="false"/>
+                                <MenuItem fx:id="exitButton" mnemonicParsing="false" onAction="#exitAction"
+                                          text="Exit"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Verify">
+                            <items>
+                                <MenuItem fx:id="verifyButton" mnemonicParsing="false" onAction="#verifyAction"
+                                          text="Verify"/>
+                                <MenuItem fx:id="verifyPostButton" mnemonicParsing="false"
+                                          onAction="#verifyAndPostAction" text="Verify and Post"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="View">
+                            <items>
+                                <Menu mnemonicParsing="false" text="View">
+                                    <items>
+                                        <MenuItem mnemonicParsing="false" onAction="#viewWordAction"
+                                                  text="Word Document"/>
+                                        <MenuItem mnemonicParsing="false" onAction="#viewPDFAction" text="PDF"/>
+                                    </items>
+                                </Menu>
+                                <MenuItem mnemonicParsing="false" onAction="#saveAsAction" text="Save As"/>
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+                <HBox prefHeight="79.0" prefWidth="942.0">
+                    <children>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                            <children>
+                                <Text fx:id="typeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Type">
+                                    <font>
+                                        <Font name="Microsoft JhengHei Bold" size="62.0"/>
+                                    </font>
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </VBox.margin>
+                                </Text>
+                            </children>
+                        </VBox>
+                        <VBox prefHeight="66.0" prefWidth="195.0">
+                            <children>
+                                <JFXTextField fx:id="companyField" disable="true" labelFloat="true"
+                                              promptText="Customer">
+                                    <VBox.margin>
+                                        <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
+                                    </VBox.margin>
+                                </JFXTextField>
+                                <Button fx:id="addCustomerButton" mnemonicParsing="false" onAction="#addCustomerAction"
+                                        prefHeight="34.0" prefWidth="181.0" text="Add Customer">
+                                    <VBox.margin>
+                                        <Insets bottom="5.0" left="7.0" right="7.0" top="7.0"/>
+                                    </VBox.margin>
+                                </Button>
+                            </children>
+                        </VBox>
+                        <VBox prefHeight="81.0" prefWidth="98.0">
+                            <children>
+                                <JFXTextField fx:id="customerIDField" disable="true" labelFloat="true"
+                                              promptText="Customer ID">
+                                    <VBox.margin>
+                                        <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
+                                    </VBox.margin>
+                                </JFXTextField>
+                                <JFXTextField fx:id="idField" disable="true" labelFloat="true" promptText="Invoice ID">
+                                    <VBox.margin>
+                                        <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
+                                    </VBox.margin>
+                                </JFXTextField>
+                            </children>
+                        </VBox>
+                        <VBox prefHeight="81.0" prefWidth="188.0">
+                            <children>
+                                <JFXTextField fx:id="ref1Field" labelFloat="true" promptText="REF1">
+                                    <VBox.margin>
+                                        <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
+                                    </VBox.margin>
+                                </JFXTextField>
+                                <JFXTextField fx:id="ref2Field" labelFloat="true" promptText="REF2">
+                                    <VBox.margin>
+                                        <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
+                                    </VBox.margin>
+                                </JFXTextField>
+                            </children>
+                        </VBox>
+                        <VBox prefHeight="109.0" prefWidth="189.0">
+                            <children>
+                                <JFXDatePicker fx:id="dateField" defaultColor="#4059a9" promptText="dd-MM-yyyy">
+                                    <VBox.margin>
+                                        <Insets bottom="14.0" left="7.0" right="7.0" top="11.6"/>
+                                    </VBox.margin>
+                                </JFXDatePicker>
+                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                    <children>
+                                        <JFXToggleButton fx:id="discountCheck" onAction="#addDiscountAction"
+                                                         prefHeight="34.0" prefWidth="101.0" size="5.0" text="Discount"
+                                                         toggleColor="#4059a9" toggleLineColor="#6577af">
+                                            <HBox.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="10.0"/>
+                                            </HBox.margin>
+                                        </JFXToggleButton>
+                                        <Spinner fx:id="discountField" disable="true" editable="true" prefHeight="26.0"
+                                                 prefWidth="76.0">
+                                            <HBox.margin>
+                                                <Insets bottom="7.0" left="7.0" right="7.0" top="14.0"/>
+                                            </HBox.margin>
+                                        </Spinner>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                        <VBox prefHeight="109.0" prefWidth="83.0">
+                            <children>
+                                <JFXSpinner fx:id="loadingBar" prefHeight="104.0" prefWidth="114.0" visible="false">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </VBox.margin>
+                                </JFXSpinner>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+                <HBox prefHeight="431.0" prefWidth="1058.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <TableView fx:id="table" editable="true" prefHeight="200.0" prefWidth="200.0"
+                                   HBox.hgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="noColumn" editable="false" maxWidth="33.0" minWidth="26.0"
+                                             prefWidth="33.0" resizable="false" sortable="false" text="No"/>
+                                <TableColumn fx:id="descriptionColumn" minWidth="502.1647529602051"
+                                             onEditCommit="#editDescriptionAction" prefWidth="563.7647895812988"
+                                             sortable="false" text="Description"/>
+                                <TableColumn fx:id="quantityColumn" maxWidth="233.835205078125"
+                                             minWidth="127.4351806640625" onEditCommit="#editQuantityAction"
+                                             prefWidth="172.23516845703125" sortable="false" text="Quantity"/>
+                                <TableColumn fx:id="uomColumn" maxWidth="58.0" minWidth="58.0" onEditCommit="#editUOM"
+                                             prefWidth="58.0" sortable="false" text="UOM"/>
+                                <TableColumn fx:id="priceColumn" maxWidth="141.0" minWidth="141.0"
+                                             onEditCommit="#editPrice" prefWidth="141.0" sortable="false" text="Price"/>
+                                <TableColumn fx:id="totalColumn" maxWidth="141.0" minWidth="141.0" prefWidth="141.0"
+                                             resizable="false" sortable="false" text="Total"/>
+                            </columns>
+                            <HBox.margin>
+                                <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
+                            </HBox.margin>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                        </TableView>
+                    </children>
+                </HBox>
+                <HBox alignment="TOP_RIGHT" prefHeight="35.0" prefWidth="1058.0" VBox.vgrow="NEVER">
+                    <children>
+                        <HBox prefHeight="54.0" prefWidth="582.0">
+                            <children>
+                                <JFXTextField fx:id="subTotalField" disable="true" labelFloat="true"
+                                              promptText="Sub Total">
+                                    <HBox.margin>
+                                        <Insets bottom="14.0" left="14.0" right="14.0" top="14.0"/>
+                                    </HBox.margin>
+                                </JFXTextField>
+                                <JFXTextField fx:id="discountTotalField" disable="true" labelFloat="true" layoutX="24.0"
+                                              layoutY="24.0" prefHeight="26.0" prefWidth="99.0" promptText="Discount">
+                                    <HBox.margin>
+                                        <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
+                                    </HBox.margin>
+                                </JFXTextField>
+                                <JFXTextField fx:id="vatTotalField" disable="true" labelFloat="true" layoutX="181.0"
+                                              layoutY="24.0" prefHeight="26.0" prefWidth="97.0" promptText="VAT">
+                                    <HBox.margin>
+                                        <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
+                                    </HBox.margin>
+                                </JFXTextField>
+                                <JFXTextField fx:id="netTotalField" disable="true" labelFloat="true" layoutX="331.0"
+                                              layoutY="24.0" prefHeight="26.0" prefWidth="171.0" promptText="Net Total">
+                                    <HBox.margin>
+                                        <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
+                                    </HBox.margin>
+                                </JFXTextField>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Button fx:id="updateButton" mnemonicParsing="false" onAction="#updateAction"
+                                        text="Update">
+                                    <HBox.margin>
+                                        <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
+                                    </HBox.margin>
+                                </Button>
+                                <Button fx:id="addItem" mnemonicParsing="false" onAction="#addItemAction"
+                                        text="Add Item">
+                                    <HBox.margin>
+                                        <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
+                                    </HBox.margin>
+                                </Button>
+                                <Button fx:id="removeItem" layoutX="500.0" layoutY="17.0" mnemonicParsing="false"
+                                        onAction="#removeItemAction" text="Remove Item">
+                                    <HBox.margin>
+                                        <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
+                                    </HBox.margin>
+                                </Button>
+                                <Button fx:id="duplicateItem" layoutX="480.0" layoutY="17.0" mnemonicParsing="false"
+                                        onAction="#duplicateItemAction" text="Duplicate Item">
+                                    <HBox.margin>
+                                        <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
+                                    </HBox.margin>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

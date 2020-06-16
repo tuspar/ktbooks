@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/9.0.1"
+      fx:controller="main.controllers.ui.HomeController">
+    <children>
+        <MenuBar VBox.vgrow="NEVER">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#settingsAction" text="Settings"/>
+                        <Menu mnemonicParsing="false" text="Backup">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#saveBackupAction" text="Save"/>
+                                <MenuItem mnemonicParsing="false" onAction="#importBackupAction" text="Import"/>
+                            </items>
+                        </Menu>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem mnemonicParsing="false" onAction="#exitAction" text="Exit"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Transactions">
+                    <items>
+                        <Menu mnemonicParsing="false" text="Invoice">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#newInvoiceAction" text="New"/>
+                                <MenuItem mnemonicParsing="false" onAction="#editInvoiceAction" text="View"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Quotation">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#newQuotationAction" text="New"/>
+                                <MenuItem mnemonicParsing="false" onAction="#editQuotationAction" text="View"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="DO">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#newDOAction" text="New"/>
+                                <MenuItem mnemonicParsing="false" onAction="#editDOAction" text="View"/>
+                            </items>
+                        </Menu>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <Menu mnemonicParsing="false" text="Receipt">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#newReceipt" text="New"/>
+                                <MenuItem mnemonicParsing="false" onAction="#editReceiptAction" text="View"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Expense">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#newExpenseAction" text="New"/>
+                                <MenuItem mnemonicParsing="false" onAction="#editExpenseAction" text="View"/>
+                            </items>
+                        </Menu>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Account">
+                    <items>
+                        <Menu mnemonicParsing="false" text="Personal">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#newPersonalAction" text="New"/>
+                                <MenuItem mnemonicParsing="false" onAction="#editPersonalAction" text="View"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Nominal">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#newNominalAction" text="New"/>
+                                <MenuItem mnemonicParsing="false" onAction="#editNominalAction" text="View"/>
+                            </items>
+                        </Menu>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Reports">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#newSOA" text="SOA"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+            <children>
+                <VBox layoutX="311.0" layoutY="68.0" prefHeight="375.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0"
+                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <children>
+                        <Text fx:id="homeLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Home">
+                            <font>
+                                <Font name="Microsoft JhengHei Bold" size="64.0"/>
+                            </font>
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0"/>
+                            </VBox.margin>
+                        </Text>
+                    </children>
+                </VBox>
+            </children>
+        </AnchorPane>
+    </children>
+</VBox>

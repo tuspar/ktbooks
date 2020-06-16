@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="726.0" prefWidth="649.0"
+            xmlns="http://javafx.com/javafx/9.0.1" fx:controller="main.controllers.editors.ReceiptEditController">
+    <children>
+        <VBox layoutX="252.0" layoutY="193.0" prefHeight="644.0" prefWidth="547.0" AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox prefHeight="87.0" prefWidth="547.0">
+                    <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Receipt">
+                            <font>
+                                <Font name="Microsoft JhengHei Bold" size="60.0"/>
+                            </font>
+                            <HBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </HBox.margin>
+                        </Text>
+                    </children>
+                </HBox>
+                <HBox prefHeight="100.0" prefWidth="200.0">
+                    <children>
+                        <JFXDatePicker fx:id="dateField" prefHeight="28.0" prefWidth="244.0" promptText="Date">
+                            <HBox.margin>
+                                <Insets bottom="25.0" left="25.0" right="10.0" top="25.0"/>
+                            </HBox.margin>
+                        </JFXDatePicker>
+                        <JFXTextField fx:id="idField" disable="true" editable="false" labelFloat="true"
+                                      prefHeight="25.0" prefWidth="102.0" promptText="ID">
+                            <HBox.margin>
+                                <Insets bottom="25.0" left="25.0" right="10.0" top="25.0"/>
+                            </HBox.margin>
+                        </JFXTextField>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" prefHeight="64.0" prefWidth="573.0">
+                    <children>
+                        <JFXTextField fx:id="customerIdField" disable="true" editable="false" labelFloat="true"
+                                      prefHeight="25.0" prefWidth="102.0" promptText="Customer ID">
+                            <HBox.margin>
+                                <Insets bottom="25.0" left="25.0" right="25.0"/>
+                            </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="companyField" disable="true" editable="false" labelFloat="true"
+                                      prefHeight="25.0" prefWidth="286.0" promptText="Customer" HBox.hgrow="ALWAYS">
+                            <HBox.margin>
+                                <Insets bottom="25.0" left="25.0" right="25.0"/>
+                            </HBox.margin>
+                        </JFXTextField>
+                        <Button mnemonicParsing="false" onAction="#addCustomerAction" text="Add Customer">
+                            <HBox.margin>
+                                <Insets bottom="25.0" left="25.0" right="25.0"/>
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                </HBox>
+                <VBox prefHeight="200.0" prefWidth="100.0">
+                    <children>
+                        <JFXTextArea fx:id="descriptionField" labelFloat="true" prefHeight="117.0" prefWidth="581.0"
+                                     promptText="Description">
+                            <VBox.margin>
+                                <Insets bottom="25.0" left="25.0" right="25.0"/>
+                            </VBox.margin>
+                        </JFXTextArea>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                            <children>
+                                <JFXTextField fx:id="paidField" labelFloat="true" onAction="#amountChangeAction"
+                                              promptText="Paid Amount">
+                                    <HBox.margin>
+                                        <Insets bottom="25.0" left="25.0" right="25.0"/>
+                                    </HBox.margin>
+                                </JFXTextField>
+                                <JFXTextField fx:id="selectedField" disable="true" editable="false" labelFloat="true"
+                                              promptText="Selected Amount">
+                                    <HBox.margin>
+                                        <Insets bottom="25.0" left="25.0" right="25.0"/>
+                                    </HBox.margin>
+                                </JFXTextField>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+                <HBox prefHeight="320.0" prefWidth="492.0">
+                    <children>
+                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <TableView fx:id="selectionTable" prefHeight="200.0" prefWidth="200.0"
+                                           VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="idSelectColumn" prefWidth="41.0" text="ID"/>
+                                        <TableColumn fx:id="dateSelectColumn" prefWidth="109.0" text="Date"/>
+                                        <TableColumn fx:id="amountSelectColumn" prefWidth="116.0" text="Amount"/>
+                                    </columns>
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="25.0" right="10.0"/>
+                                    </VBox.margin>
+                                </TableView>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="269.0" prefWidth="57.0"
+                              HBox.hgrow="NEVER">
+                            <children>
+                                <Button mnemonicParsing="false" onAction="#selectOne" prefHeight="25.0" prefWidth="35.0"
+                                        text="&gt;">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </VBox.margin>
+                                </Button>
+                                <Button mnemonicParsing="false" onAction="#selectAll" prefHeight="25.0" prefWidth="35.0"
+                                        text="&gt;&gt;">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </VBox.margin>
+                                </Button>
+                                <Button mnemonicParsing="false" onAction="#removeOne" prefWidth="35.0" text="&lt;">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </VBox.margin>
+                                </Button>
+                                <Button mnemonicParsing="false" onAction="#removeAll" prefWidth="35.0" text="&lt;&lt;">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </VBox.margin>
+                                </Button>
+                            </children>
+                        </VBox>
+                        <VBox layoutX="110.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <TableView fx:id="selectedTable" prefHeight="200.0" prefWidth="200.0"
+                                           VBox.vgrow="ALWAYS">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="25.0"/>
+                                    </VBox.margin>
+                                    <columns>
+                                        <TableColumn fx:id="idSelectedColumn" prefWidth="41.0" text="ID"/>
+                                        <TableColumn fx:id="dateSelectedColumn" prefWidth="132.0" text="Date"/>
+                                        <TableColumn fx:id="amountSelectedColumn" prefWidth="93.0" text="Amount"/>
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+                <HBox prefHeight="42.0" prefWidth="649.0">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="61.0" prefWidth="605.0">
+                            <children>
+                                <Button mnemonicParsing="false" onAction="#viewWordAction" text="View Word">
+                                    <HBox.margin>
+                                        <Insets bottom="15.0" left="25.0" right="15.0" top="15.0"/>
+                                    </HBox.margin>
+                                </Button>
+                                <Button layoutX="35.0" layoutY="25.0" mnemonicParsing="false" onAction="#viewPDFAction"
+                                        text="View PDF"/>
+                                <Button mnemonicParsing="false" onAction="#saveAsAction" text="Save As">
+                                    <HBox.margin>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+                                    </HBox.margin>
+                                </Button>
+                                <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteAction"
+                                        text="Delete"/>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="10.0" prefHeight="61.0"
+                              prefWidth="486.0">
+                            <children>
+                                <Button fx:id="postButton" defaultButton="true" disable="true" mnemonicParsing="false"
+                                        onAction="#postReceipt" text="Post">
+                                    <HBox.margin>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+                                    </HBox.margin>
+                                </Button>
+                                <Button mnemonicParsing="false" onAction="#cancelAction" text="Cancel">
+                                    <HBox.margin>
+                                        <Insets bottom="15.0" left="15.0" right="25.0" top="15.0"/>
+                                    </HBox.margin>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
