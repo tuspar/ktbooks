@@ -24,7 +24,7 @@ public class NominalEditController implements Initializable {
     private JFXTextField idField;
 
     @FXML
-    private JFXComboBox<Account.PersonalType> typeComboBox;
+    private JFXComboBox<Account.AccountType> typeComboBox;
 
     @FXML
     private Button deleteButton;
@@ -68,8 +68,8 @@ public class NominalEditController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        typeComboBox.getItems().setAll(Account.PersonalType.values());
-        typeComboBox.getItems().removeAll(Account.PersonalType.CUSTOMER, Account.PersonalType.SUPPLIER);
+        typeComboBox.getItems().setAll(Account.AccountType.values());
+        typeComboBox.getItems().removeAll(Account.AccountType.CUSTOMER, Account.AccountType.SUPPLIER);
         idField.setText(String.valueOf(Account.getCount() + 1));
         deleteButton.setVisible(false);
     }

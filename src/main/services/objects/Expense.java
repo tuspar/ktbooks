@@ -1,7 +1,7 @@
 package main.services.objects;
 
 import main.services.backend.Database;
-import org.controlsfx.control.Notifications;
+import main.services.backend.Settings;
 import org.dizitart.no2.Document;
 import org.dizitart.no2.IndexType;
 import org.dizitart.no2.Nitrite;
@@ -23,7 +23,7 @@ public class Expense implements Mappable {
     @Id
     private int id;
 
-    private Account account;
+    private Account debit, credit;
     private String amount;
     private String description;
     private LocalDate date;
@@ -36,11 +36,7 @@ public class Expense implements Mappable {
     }
 
     public static int getCount() {
-        for (int count = 100; true; count++) {
-            if (load(count) == null) {
-                return count - 1;
-            }
-        }
+        return Settings.getInstance().getCount(Expense.class);
     }
 
     public static void delete(int id) {
@@ -57,12 +53,20 @@ public class Expense implements Mappable {
         this.id = id;
     }
 
-    public Account getAccount() {
-        return account;
+    public Account getDebit() {
+        return debit;
     }
 
-    public void setAccount(Account account) {
-        this.account = account;
+    public void setDebit(Account debit) {
+        this.debit = debit;
+    }
+
+    public Account getCredit() {
+        return credit;
+    }
+
+    public void setCredit(Account credit) {
+        this.credit = credit;
     }
 
     public String getAmount() {
@@ -98,7 +102,7 @@ public class Expense implements Mappable {
     }
 
     public String getCompany() {
-        return account.getCompany();
+        return debit.getCompany();
     }
 
     public void save() {
@@ -106,12 +110,8 @@ public class Expense implements Mappable {
         ObjectRepository<Expense> repo = db.getRepository(Expense.class);
         if (id > getCount()) {
             repo.insert(this);
-            Notifications.create().title("Saved Expense")
-                    .text("Expense " + id + " for " + account.getCompany() + " was successfully saved!").showInformation();
         } else {
             repo.update(eq("id", id), this);
-            Notifications.create().title("Updated Expense")
-                    .text("Expense " + id + " for " + account.getCompany() + " was successfully updated!").showInformation();
         }
     }
 
@@ -119,7 +119,8 @@ public class Expense implements Mappable {
     public Document write(NitriteMapper mapper) {
         Document document = new Document();
         document.put("id", getId());
-        document.put("account", getAccount().write(mapper));
+        document.put("credit_id", getCredit().getId());
+        document.put("debit_id", getDebit().getId());
         document.put("description", getDescription());
         document.put("date", getDate());
         document.put("deleted", isDeleted());
@@ -131,10 +132,8 @@ public class Expense implements Mappable {
     @Override
     public void read(NitriteMapper nitriteMapper, Document document) {
         setId((Integer) document.get("id"));
-
-        Account account = new Account();
-        account.read(nitriteMapper, (Document) document.get("account"));
-        setAccount(account);
+        setCredit(Account.load((Integer) document.get("credit_id")));
+        setDebit(Account.load((Integer) document.get("debit_id")));
 
         setDescription((String) document.get("description"));
         setDate((LocalDate) document.get("date"));

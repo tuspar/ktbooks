@@ -3,5 +3,7 @@ assets/
 out/
 src/META-INF/
 KTBooks.iml
-main.db
+data/
 nitrite-explorer-3.1.0.jar
+updater/updater.iml
+updater/src/META-INF/

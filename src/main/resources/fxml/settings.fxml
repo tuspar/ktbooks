@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.ToggleSwitch?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="640.0" prefWidth="457.0"
+            xmlns="http://javafx.com/javafx/9.0.1" fx:controller="main.controllers.ui.SettingsController">
+    <children>
+        <VBox prefHeight="640.0" prefWidth="548.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Settings">
+                    <font>
+                        <Font name="Microsoft JhengHei Bold" size="64.0"/>
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </VBox.margin>
+                </Text>
+                <TabPane prefHeight="640.0" prefWidth="548.0" side="LEFT" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                        <Tab text="Backup">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="135.0" layoutY="212.0" prefHeight="502.0" prefWidth="548.0"
+                                              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Google Drive">
+                                                    <font>
+                                                        <Font name="Microsoft JhengHei Bold" size="36.0"/>
+                                                    </font>
+                                                    <VBox.margin>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                                    </VBox.margin>
+                                                </Text>
+                                                <HBox prefHeight="99.0" prefWidth="548.0">
+                                                    <children>
+                                                        <VBox prefHeight="123.0" prefWidth="306.0" HBox.hgrow="ALWAYS">
+                                                            <children>
+                                                                <JFXTextField fx:id="gdriveUserField" disable="true"
+                                                                              editable="false" labelFloat="true"
+                                                                              prefHeight="25.0" prefWidth="206.0"
+                                                                              promptText="Username" VBox.vgrow="NEVER">
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </VBox.margin>
+                                                                </JFXTextField>
+                                                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                                                    <children>
+                                                                        <ToggleSwitch fx:id="gdriveBackupToggle"
+                                                                                      text="Drive Backup">
+                                                                            <HBox.margin>
+                                                                                <Insets bottom="10.0" left="10.0"
+                                                                                        right="10.0" top="15.0"/>
+                                                                            </HBox.margin>
+                                                                        </ToggleSwitch>
+                                                                        <JFXTextField fx:id="gdriveFrequencyField"
+                                                                                      labelFloat="true"
+                                                                                      promptText="Update Frequency (Days)">
+                                                                            <HBox.margin>
+                                                                                <Insets bottom="10.0" left="10.0"
+                                                                                        right="10.0" top="10.0"/>
+                                                                            </HBox.margin>
+                                                                        </JFXTextField>
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox prefHeight="123.0" prefWidth="77.0">
+                                                            <children>
+                                                                <Button fx:id="gdriveSignInButton"
+                                                                        mnemonicParsing="false"
+                                                                        onAction="#gdriveSignInAction" text="Sign In ">
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </VBox.margin>
+                                                                </Button>
+                                                                <Button fx:id="gdriveLogoutButton"
+                                                                        mnemonicParsing="false"
+                                                                        onAction="#gdriveLogoutAction" text="Logout">
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </VBox.margin>
+                                                                </Button>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+                                                <Separator prefWidth="200.0"/>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Auto-Backup">
+                                                    <font>
+                                                        <Font name="Microsoft JhengHei Bold" size="36.0"/>
+                                                    </font>
+                                                    <VBox.margin>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                                    </VBox.margin>
+                                                </Text>
+                                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                                    <children>
+                                                        <VBox prefHeight="100.0" prefWidth="292.0" HBox.hgrow="ALWAYS">
+                                                            <children>
+                                                                <JFXTextField fx:id="autoBackupPathField" disable="true"
+                                                                              editable="false" labelFloat="true"
+                                                                              promptText="Path">
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </VBox.margin>
+                                                                </JFXTextField>
+                                                                <ToggleSwitch fx:id="autoBackupToggle"
+                                                                              text="Auto Backup">
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </VBox.margin>
+                                                                </ToggleSwitch>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="96.0"
+                                                              HBox.hgrow="ALWAYS">
+                                                            <children>
+                                                                <Button mnemonicParsing="false"
+                                                                        onAction="#changePathAction" text="Open">
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </VBox.margin>
+                                                                </Button>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+                                                <Separator prefWidth="200.0"/>
+                                                <Text layoutX="20.0" layoutY="229.0" strokeType="OUTSIDE"
+                                                      strokeWidth="0.0" text="Manual">
+                                                    <font>
+                                                        <Font name="Microsoft JhengHei Bold" size="36.0"/>
+                                                    </font>
+                                                    <VBox.margin>
+                                                        <Insets left="10.0" right="10.0" top="10.0"/>
+                                                    </VBox.margin>
+                                                </Text>
+                                                <HBox prefHeight="19.0" prefWidth="408.0">
+                                                    <children>
+                                                        <Button mnemonicParsing="false" onAction="#saveBackupAction"
+                                                                text="Save Backup">
+                                                            <HBox.margin>
+                                                                <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                        top="10.0"/>
+                                                            </HBox.margin>
+                                                        </Button>
+                                                        <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false"
+                                                                onAction="#importBackupAction" text="Import">
+                                                            <HBox.margin>
+                                                                <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                        top="10.0"/>
+                                                            </HBox.margin>
+                                                        </Button>
+                                                    </children>
+                                                </HBox>
+                                                <Separator prefWidth="200.0"/>
+                                                <HBox alignment="BOTTOM_RIGHT" prefHeight="70.0" prefWidth="408.0">
+                                                    <children>
+                                                        <Button defaultButton="true" mnemonicParsing="false"
+                                                                onAction="#applyBackupSettings" text="Apply">
+                                                            <HBox.margin>
+                                                                <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                        top="10.0"/>
+                                                            </HBox.margin>
+                                                        </Button>
+                                                        <Button cancelButton="true" layoutX="10.0" layoutY="10.0"
+                                                                mnemonicParsing="false" onAction="#exitAction"
+                                                                text="Cancel">
+                                                            <HBox.margin>
+                                                                <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                        top="10.0"/>
+                                                            </HBox.margin>
+                                                        </Button>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                        <Tab text="Format">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="76.0" layoutY="196.0" prefHeight="514.0" prefWidth="408.0"
+                                              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Templates">
+                                                    <font>
+                                                        <Font name="Microsoft JhengHei Bold" size="36.0"/>
+                                                    </font>
+                                                    <VBox.margin>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                                    </VBox.margin>
+                                                </Text>
+                                                <TableView fx:id="templateTable" prefHeight="200.0" prefWidth="200.0">
+                                                    <columns>
+                                                        <TableColumn fx:id="templateLabelColumn" prefWidth="186.0"
+                                                                     resizable="false" text="Name"/>
+                                                        <TableColumn fx:id="templatePathColumn" minWidth="0.0"
+                                                                     prefWidth="201.0" resizable="false" text="File"/>
+                                                    </columns>
+                                                    <VBox.margin>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0"/>
+                                                    </VBox.margin>
+                                                </TableView>
+                                                <HBox alignment="TOP_RIGHT" prefHeight="6.0" prefWidth="388.0">
+                                                    <children>
+                                                        <Button mnemonicParsing="false" onAction="#editFormatAction"
+                                                                prefHeight="25.0" prefWidth="54.0" text="Edit"/>
+                                                    </children>
+                                                    <VBox.margin>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                                    </VBox.margin>
+                                                </HBox>
+                                                <Separator prefWidth="200.0"/>
+                                                <Text strikethrough="true" strokeType="OUTSIDE" strokeWidth="0.0"
+                                                      text="Number Format">
+                                                    <font>
+                                                        <Font name="Microsoft JhengHei Bold" size="36.0"/>
+                                                    </font>
+                                                    <VBox.margin>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                                    </VBox.margin>
+                                                </Text>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                        <Tab text="Security">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="217.0" layoutY="157.0" prefHeight="514.0" prefWidth="408.0"
+                                              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Recovery">
+                                                    <font>
+                                                        <Font name="Microsoft JhengHei Bold" size="36.0"/>
+                                                    </font>
+                                                    <VBox.margin>
+                                                        <Insets left="10.0" right="10.0" top="10.0"/>
+                                                    </VBox.margin>
+                                                </Text>
+                                                <HBox prefHeight="41.0" prefWidth="408.0">
+                                                    <children>
+                                                        <Button mnemonicParsing="false" onAction="#recoveryAction"
+                                                                text="Attempt Recovery">
+                                                            <HBox.margin>
+                                                                <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                        top="10.0"/>
+                                                            </HBox.margin>
+                                                        </Button>
+                                                    </children>
+                                                </HBox>
+                                                <Separator prefWidth="200.0"/>
+                                                <Text layoutX="20.0" layoutY="59.0" strokeType="OUTSIDE"
+                                                      strokeWidth="0.0" text="Login">
+                                                    <font>
+                                                        <Font name="Microsoft JhengHei Bold" size="36.0"/>
+                                                    </font>
+                                                    <VBox.margin>
+                                                        <Insets left="10.0" right="10.0"/>
+                                                    </VBox.margin>
+                                                </Text>
+                                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                                    <children>
+                                                        <HBox prefHeight="46.0" prefWidth="346.0">
+                                                            <children>
+                                                                <JFXTextField fx:id="usernameField" labelFloat="true"
+                                                                              prefHeight="25.0" prefWidth="233.0"
+                                                                              promptText="Username">
+                                                                    <HBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </HBox.margin>
+                                                                </JFXTextField>
+                                                                <Button mnemonicParsing="false"
+                                                                        onAction="#changeUsername" text="Update">
+                                                                    <HBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </HBox.margin>
+                                                                </Button>
+                                                            </children>
+                                                        </HBox>
+                                                    </children>
+                                                </HBox>
+                                                <Separator prefWidth="200.0"/>
+                                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                                    <children>
+                                                        <VBox prefHeight="100.0" prefWidth="250.0">
+                                                            <children>
+                                                                <JFXPasswordField fx:id="oldPasswordField"
+                                                                                  promptText="Old Password">
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </VBox.margin>
+                                                                </JFXPasswordField>
+                                                                <JFXPasswordField fx:id="newPasswordField"
+                                                                                  layoutX="20.0" layoutY="65.0"
+                                                                                  promptText="New Password">
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </VBox.margin>
+                                                                </JFXPasswordField>
+                                                                <JFXPasswordField fx:id="confirmPasswordField"
+                                                                                  layoutX="10.0" layoutY="100.0"
+                                                                                  promptText="Confirm Password">
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                                top="10.0"/>
+                                                                    </VBox.margin>
+                                                                </JFXPasswordField>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+                                                <HBox layoutX="10.0" layoutY="71.0" prefHeight="41.0" prefWidth="408.0">
+                                                    <children>
+                                                        <Button mnemonicParsing="false" onAction="#changePasswordAction"
+                                                                text="Update">
+                                                            <HBox.margin>
+                                                                <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                        top="10.0"/>
+                                                            </HBox.margin>
+                                                        </Button>
+                                                    </children>
+                                                </HBox>
+                                                <Separator prefWidth="200.0"/>
+                                                <Text layoutX="20.0" layoutY="165.0" strokeType="OUTSIDE"
+                                                      strokeWidth="0.0" text="Update">
+                                                    <font>
+                                                        <Font name="Microsoft JhengHei Bold" size="36.0"/>
+                                                    </font>
+                                                    <VBox.margin>
+                                                        <Insets bottom="10.0" left="10.0" right="10.0"/>
+                                                    </VBox.margin>
+                                                </Text>
+                                                <Text fx:id="versionText" layoutX="20.0" layoutY="254.0"
+                                                      strokeType="OUTSIDE" strokeWidth="0.0" text="Version: ">
+                                                    <font>
+                                                        <Font name="Microsoft JhengHei" size="14.0"/>
+                                                    </font>
+                                                    <VBox.margin>
+                                                        <Insets left="10.0" right="10.0"/>
+                                                    </VBox.margin>
+                                                </Text>
+                                                <HBox layoutX="10.0" layoutY="68.0" prefHeight="41.0" prefWidth="408.0">
+                                                    <children>
+                                                        <Button mnemonicParsing="false" onAction="#updateAction"
+                                                                text="Check for Updates">
+                                                            <HBox.margin>
+                                                                <Insets bottom="10.0" left="10.0" right="10.0"
+                                                                        top="10.0"/>
+                                                            </HBox.margin>
+                                                        </Button>
+                                                    </children>
+                                                </HBox>
+                                                <Separator layoutX="10.0" layoutY="392.0" prefWidth="200.0"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                    </tabs>
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </VBox.margin>
+                </TabPane>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

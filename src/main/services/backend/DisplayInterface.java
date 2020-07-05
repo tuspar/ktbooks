@@ -1,5 +1,7 @@
 package main.services.backend;
 
+import com.jfoenix.controls.JFXSpinner;
+import com.jfoenix.validation.RequiredFieldValidator;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -16,6 +18,7 @@ import main.services.objects.Account;
 import main.services.objects.Expense;
 import main.services.objects.Receipt;
 import main.services.objects.SalesDocument;
+import org.controlsfx.control.Notifications;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -97,6 +100,11 @@ public class DisplayInterface {
         stage.showAndWait();
     }
 
+    public static void settings() {
+        load("settings", "Settings", false);
+        stage.showAndWait();
+    }
+
     private static Object load(String fxml, String title, boolean maximized) {
         stage = new Stage();
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("resources/fxml/" + fxml + ".fxml"));
@@ -107,7 +115,7 @@ public class DisplayInterface {
         }
         stage.getIcons().add(new Image(Main.class.getResourceAsStream("resources/images/icon.png")));
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.resizableProperty().set(false);
+        stage.resizableProperty().set(true);
         stage.setTitle(title);
         stage.setMaximized(maximized);
         return fxmlLoader.getController();
@@ -125,12 +133,11 @@ public class DisplayInterface {
         alert.setHeaderText(null);
         alert.setContentText(message);
 
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Main.class.getResourceAsStream("resources/images/icon.png")));
+
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            return true;
-        } else {
-            return false;
-        }
+        return result.get() == ButtonType.OK;
     }
 
     public static void confirmExit(ActionEvent event) {
@@ -143,11 +150,36 @@ public class DisplayInterface {
         ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
     }
 
+    public static void notification(String title, String message) {
+        Notifications.create().title(title).text(message).showInformation();
+    }
+
+    public static void loading(Runnable runnable, JFXSpinner... spinners) {
+        new Thread(() -> {
+            for (JFXSpinner spinner : spinners) {
+                spinner.setVisible(true);
+            }
+            runnable.run();
+            for (JFXSpinner spinner : spinners) {
+                spinner.setVisible(false);
+            }
+        }).start();
+    }
+
+    //Field Validator
+    public static RequiredFieldValidator getRequiredValidator() {
+        RequiredFieldValidator validator = new RequiredFieldValidator();
+        validator.setMessage("Required Field");
+        return validator;
+    }
+
+
     public enum ConfirmType {
         EXIT("Unsaved Data", "Are you sure you want to exit"),
         DELETE("Confirm Delete", "Are you sure you want to delete?\nThis action cannot be undone."),
         LOGIN("Incorrect Password", "Incorrect Password!\nPlease try again."),
-        INCOMPLETE("Error", "Please fill in all fields!");
+        INCOMPLETE("Error", "Please fill in all fields!"),
+        SELECT_ROW("Error", "Please select a row");
 
         private String title;
         private String message;

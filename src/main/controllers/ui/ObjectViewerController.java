@@ -5,22 +5,26 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import main.services.backend.DisplayInterface;
 import main.services.objects.Account;
 import main.services.objects.Expense;
 import main.services.objects.Receipt;
 import main.services.objects.SalesDocument;
 
-public class ObjectViewerController {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class ObjectViewerController implements Initializable {
     private final String[] personalColumns = new String[]{"ID", "Company", "Type", "Notes"};
     private final String[] salesDocumentColumns = new String[]{"ID", "Type", "Company", "Total"};
-    private final String[] receiptColumns = new String[]{"ID", "Date", "Company", "Description", "Total"};
+    private final String[] receiptColumns = new String[]{"ID", "Date", "Company", "Description", "Invoices", "Total"};
     private final String[] expenseColumns = new String[]{"ID", "Date", "Company", "Description", "Amount"};
     @FXML
     private TableView<Object> table;
@@ -94,44 +98,44 @@ public class ObjectViewerController {
                     typeSelector.setValue("All");
                     break;
                 case CUSTOMER:
-                    personalLoader(Account.PersonalType.CUSTOMER);
+                    personalLoader(Account.AccountType.CUSTOMER);
                     break;
                 case SUPPLIER:
-                    personalLoader(Account.PersonalType.SUPPLIER);
+                    personalLoader(Account.AccountType.SUPPLIER);
                     break;
                 case EXPENSE:
-                    personalLoader(Account.PersonalType.EXPENSE);
+                    personalLoader(Account.AccountType.EXPENSE);
                     break;
                 case INCOME:
-                    personalLoader(Account.PersonalType.INCOME);
+                    personalLoader(Account.AccountType.INCOME);
                     break;
                 case ASSET:
-                    personalLoader(Account.PersonalType.ASSET);
+                    personalLoader(Account.AccountType.ASSET);
                     break;
                 case LIABILITY:
-                    personalLoader(Account.PersonalType.LIABILITY);
+                    personalLoader(Account.AccountType.LIABILITY);
                     break;
                 case PERSONAL_ACCOUNTS:
-                    personalLoader(Account.PersonalType.CUSTOMER);
-                    personalLoader(Account.PersonalType.SUPPLIER);
+                    personalLoader(Account.AccountType.CUSTOMER);
+                    personalLoader(Account.AccountType.SUPPLIER);
                     typeSelector.getItems().add("All");
                     typeSelector.setValue("All");
                     break;
                 case NOMINAL_ACCOUNTS:
-                    personalLoader(Account.PersonalType.EXPENSE);
-                    personalLoader(Account.PersonalType.INCOME);
-                    personalLoader(Account.PersonalType.ASSET);
-                    personalLoader(Account.PersonalType.LIABILITY);
+                    personalLoader(Account.AccountType.EXPENSE);
+                    personalLoader(Account.AccountType.INCOME);
+                    personalLoader(Account.AccountType.ASSET);
+                    personalLoader(Account.AccountType.LIABILITY);
                     typeSelector.getItems().add("All");
                     typeSelector.setValue("All");
                     break;
                 case ALL_ACCOUNTS:
-                    personalLoader(Account.PersonalType.CUSTOMER);
-                    personalLoader(Account.PersonalType.SUPPLIER);
-                    personalLoader(Account.PersonalType.EXPENSE);
-                    personalLoader(Account.PersonalType.INCOME);
-                    personalLoader(Account.PersonalType.ASSET);
-                    personalLoader(Account.PersonalType.LIABILITY);
+                    personalLoader(Account.AccountType.CUSTOMER);
+                    personalLoader(Account.AccountType.SUPPLIER);
+                    personalLoader(Account.AccountType.EXPENSE);
+                    personalLoader(Account.AccountType.INCOME);
+                    personalLoader(Account.AccountType.ASSET);
+                    personalLoader(Account.AccountType.LIABILITY);
                     typeSelector.getItems().add("All");
                     typeSelector.setValue("All");
                     break;
@@ -201,7 +205,6 @@ public class ObjectViewerController {
 
     @FXML
     void searchAction(KeyEvent event) {
-        table.setItems(typeSorted);
         if (event.getCode() == KeyCode.ENTER) {
             if (table.getSelectionModel().getSelectedIndex() == -1) {
                 table.getSelectionModel().select(0);
@@ -209,6 +212,7 @@ public class ObjectViewerController {
                 selectButtonAction();
             }
         } else {
+            table.setItems(typeSorted);
             String search = searchField.getText().toLowerCase();
             if (!search.isEmpty()) {
                 ObservableList<Object> sorted = FXCollections.observableArrayList();
@@ -242,14 +246,14 @@ public class ObjectViewerController {
                                 break;
                             case BILL:
                                 Expense expense = (Expense) object;
-                                if (expense.getAccount().getCompany().toLowerCase().startsWith(search) ||
+                                if (expense.getDebit().getCompany().toLowerCase().startsWith(search) ||
                                         String.valueOf(expense.getId()).equals(search)) {
                                     sorted.add(object);
                                 }
                                 break;
                             case RECEIPT:
                                 Receipt receipt = (Receipt) object;
-                                if (receipt.getAccount().getCompany().toLowerCase().startsWith(search) ||
+                                if (receipt.getCredit().getCompany().toLowerCase().startsWith(search) ||
                                         String.valueOf(receipt.getId()).equals(search)) {
                                     sorted.add(object);
                                 }
@@ -263,16 +267,12 @@ public class ObjectViewerController {
 
     @FXML
     void selectButtonAction() {
-        if (table.getSelectionModel().getSelectedIndex() == -1) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText("Please select an row!");
-            alert.showAndWait();
-        } else {
+        if (table.getSelectionModel().getSelectedIndex() != -1) {
             selected = table.getSelectionModel().getSelectedItem();
             Stage stage = (Stage) table.getScene().getWindow();
             stage.close();
+        } else {
+            DisplayInterface.confirmDialog(DisplayInterface.ConfirmType.SELECT_ROW);
         }
     }
 
@@ -283,7 +283,7 @@ public class ObjectViewerController {
         searchField.positionCaret((searchField.getText() + event.getCharacter()).length());
     }
 
-    private void personalLoader(Account.PersonalType type) {
+    private void personalLoader(Account.AccountType type) {
         for (int i = 100; i <= Account.getCount(); i++) {
             Account account = Account.load(i);
             if (!account.isDeleted() && account.getType().equals(type)) {
@@ -328,6 +328,11 @@ public class ObjectViewerController {
         typeSelector.setDisable(true);
     }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        searchField.requestFocus();
+    }
+
     public enum ViewerMode {
         CUSTOMER("Customer"),
         SUPPLIER("Supplier"),
@@ -340,7 +345,7 @@ public class ObjectViewerController {
         ALL_ACCOUNTS("All"),
         INVOICE("Invoice"),
         QUOTATION("Quotation"),
-        DO("Delivery Order"),
+        DO("DO"),
         ALL_SALE_DOCUMENTS("All"),
         RECEIPT("Receipt"),
         BILL("Purchase");

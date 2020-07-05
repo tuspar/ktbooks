@@ -22,12 +22,13 @@
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                     </VBox.margin>
                 </Text>
-                <JFXTextField fx:id="usernameField" labelFloat="true" promptText="Username">
+                <JFXTextField fx:id="usernameField" labelFloat="true" onKeyPressed="#usernameEnter"
+                              promptText="Username">
                     <VBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                     </VBox.margin>
                 </JFXTextField>
-                <JFXPasswordField fx:id="passwordField" promptText="Password">
+                <JFXPasswordField fx:id="passwordField" onKeyPressed="#passwordEnter" promptText="Password">
                     <VBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                     </VBox.margin>

@@ -7,6 +7,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import main.services.backend.Database;
+import main.services.backend.Settings;
 import org.controlsfx.control.Notifications;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.dizitart.no2.Document;
@@ -36,8 +37,7 @@ import static org.dizitart.no2.objects.filters.ObjectFilters.eq;
         @Index(value = "type", type = IndexType.NonUnique)
 })
 public class SalesDocument implements Mappable {
-    private static final String SALES_DOC = "assets/salesDocument.docx";
-    private static final String decimalFormat = "#0.00";
+    private final DecimalFormat numberFormat = Settings.getInstance().getNumberFormat();
 
     private ObservableList<SalesDocument.Item> items = FXCollections.observableArrayList();
     private double discount;
@@ -67,11 +67,8 @@ public class SalesDocument implements Mappable {
     }
 
     public static int getCount(SalesDocumentType type) {
-        for (int count = 100; true; count++) {
-            if (load(count, type) == null) {
-                return count - 1;
-            }
-        }
+        ObjectRepository repo = Database.getInstance().getRepository(SalesDocument.class);
+        return 99 + repo.find(eq("type", type.toString())).size();
     }
 
     public static String[] getRefs(SalesDocumentType type) {
@@ -178,21 +175,19 @@ public class SalesDocument implements Mappable {
         for (SalesDocument.Item item : items) {
             total += Double.parseDouble(item.getTotal());
         }
-        return new DecimalFormat(decimalFormat).format(total);
+        return numberFormat.format(total);
     }
 
     public String getDiscountTotal() {
-        return new DecimalFormat(decimalFormat).format(Double.parseDouble(getSubTotal()) * (discount * 0.01));
+        return numberFormat.format(Double.parseDouble(getSubTotal()) * (discount * 0.01));
     }
 
     public String getVATTotal() {
-        return new DecimalFormat(decimalFormat).format((Double.parseDouble(getSubTotal())
-                - Double.parseDouble(getDiscountTotal())) * 0.05);
+        return numberFormat.format((Double.parseDouble(getSubTotal()) - Double.parseDouble(getDiscountTotal())) * 0.05);
     }
 
     public String getTotal() {
-        return new DecimalFormat(decimalFormat).format((Double.parseDouble(getSubTotal())
-                - Double.parseDouble(getDiscountTotal())) + Double.parseDouble(getVATTotal()));
+        return numberFormat.format((Double.parseDouble(getSubTotal()) - Double.parseDouble(getDiscountTotal())) + Double.parseDouble(getVATTotal()));
     }
 
     //Database Actions
@@ -201,12 +196,8 @@ public class SalesDocument implements Mappable {
         ObjectRepository<SalesDocument> repo = db.getRepository(SalesDocument.class);
         if (id > getCount(type)) {
             repo.insert(this);
-            Notifications.create().title("Saved " + getType().toString())
-                    .text(getType().toString() + " was successfully saved!").showInformation();
         } else {
             repo.update(and(eq("type", type.toString()), eq("id", type.toString().charAt(0) + String.valueOf(id))), this);
-            Notifications.create().title("Updated " + getType().toString())
-                    .text(getType().toString() + " was successfully updated!").showInformation();
         }
     }
 
@@ -214,8 +205,7 @@ public class SalesDocument implements Mappable {
     public Document write(NitriteMapper mapper) {
         Document document = new Document();
         document.put("id", getType().toString().charAt(0) + String.valueOf(getId()));
-        Document accountDoc = account.write(mapper);
-        document.put("account", accountDoc);
+        document.put("account_id", getAccount().getId());
         document.put("discount", getDiscount());
         document.put("ref1", getRef1());
         document.put("ref2", getRef2());
@@ -235,10 +225,7 @@ public class SalesDocument implements Mappable {
     @Override
     public void read(NitriteMapper nitriteMapper, Document document) {
         setId(Integer.parseInt(((String) document.get("id")).substring(1)));
-
-        Account account = new Account();
-        account.read(nitriteMapper, (Document) document.get("account"));
-        setAccount(account);
+        setAccount(Account.load((Integer) document.get("account_id")));
 
         setDiscount((Double) document.get("discount"));
         setRef1((String) document.get("ref1"));
@@ -259,12 +246,22 @@ public class SalesDocument implements Mappable {
     //Report Generation
     public void generateSalesDocument(String path, FileFormat ext) {
         com.spire.doc.Document format = new com.spire.doc.Document();
-        format.loadFromFile(SALES_DOC);
+        switch (getType()) {
+            case QUOTATION:
+                format.loadFromFile(Settings.Template.QUOTATION.getPath());
+                break;
+            case INVOICE:
+                format.loadFromFile(Settings.Template.INVOICE.getPath());
+                break;
+            case DO:
+                format.loadFromFile(Settings.Template.INVOICE.getPath());
+                break;
+        }
         format.replace("#type", getType().toString(), true, true);
         format.replace("#company_name", getAccount().getCompany(), true, true);
         format.replace("#company_address", getAccount().getAddress(), true, true);
         format.replace("#company_tel", getAccount().getPhone(), true, true);
-        format.replace("#company_trn", getAccount().getCompany(), true, true);
+        format.replace("#company_trn", getAccount().getTrn(), true, true);
         format.replace("#type_no", getType().toString() + " No:", true, true);
         format.replace("#doc_id", String.valueOf(getId()), true, true);
         format.replace("#doc_date", getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), true, true);
@@ -273,11 +270,19 @@ public class SalesDocument implements Mappable {
         format.replace("#ref1data", getRef1(), true, true);
         format.replace("#ref2data", getRef2(), true, true);
 
-        format.replace("#subtotal", String.valueOf(getSubTotal()), true, true);
-        format.replace("#discount_percent", "Discount(" + getDiscount() + "%):", true, true);
-        format.replace("#discount", String.valueOf(getDiscountTotal()), true, true);
-        format.replace("#vat", String.valueOf(getVATTotal()), true, true);
-        format.replace("#total", getTotal(), true, true);
+        if (!getType().equals(SalesDocumentType.DO)) {
+            format.replace("#subtotal", String.valueOf(getSubTotal()), true, true);
+            format.replace("#discount_percent", "Discount(" + getDiscount() + "%):", true, true);
+            format.replace("#discount", String.valueOf(getDiscountTotal()), true, true);
+            format.replace("#vat", String.valueOf(getVATTotal()), true, true);
+            format.replace("#total", getTotal(), true, true);
+        } else {
+            format.replace("#subtotal", "", true, true);
+            format.replace("#discount_percent", "Discount(" + getDiscount() + "%):", true, true);
+            format.replace("#discount", "", true, true);
+            format.replace("#vat", "", true, true);
+            format.replace("#total", "", true, true);
+        }
 
         Table table = format.getSections().get(0).getTables().get(0);
         for (int i = 0; i < getItems().size() - 1; i++) {
@@ -339,7 +344,7 @@ public class SalesDocument implements Mappable {
             this.uom = new SimpleStringProperty(uom);
             this.quantity = new SimpleStringProperty(String.valueOf(quantity));
             this.price = new SimpleStringProperty(String.valueOf(price));
-            this.total = new SimpleStringProperty(new DecimalFormat(decimalFormat).format(Double.parseDouble(quantity) * Double.parseDouble(price)));
+            this.total = new SimpleStringProperty(Settings.getInstance().getNumberFormat().format(Double.parseDouble(quantity) * Double.parseDouble(price)));
         }
 
         public String getNo() {
@@ -391,11 +396,11 @@ public class SalesDocument implements Mappable {
         }
 
         public String getPrice() {
-            return new DecimalFormat(decimalFormat).format(Double.parseDouble(price.get()));
+            return Settings.getInstance().getNumberFormat().format(Double.parseDouble(price.get()));
         }
 
         public void setPrice(String price) {
-            this.price.set(new DecimalFormat(decimalFormat).format(Double.parseDouble(price)));
+            this.price.set(Settings.getInstance().getNumberFormat().format(Double.parseDouble(price)));
         }
 
         public StringProperty priceProperty() {
@@ -403,15 +408,15 @@ public class SalesDocument implements Mappable {
         }
 
         public String getTotal() {
-            return new DecimalFormat(decimalFormat).format(Double.parseDouble(quantity.get()) * Double.parseDouble(price.get()));
+            return Settings.getInstance().getNumberFormat().format(Double.parseDouble(quantity.get()) * Double.parseDouble(price.get()));
         }
 
         public void setTotal() {
-            this.total.set(new DecimalFormat(decimalFormat).format(Double.parseDouble(quantity.get()) * Double.parseDouble(price.get())));
+            this.total.set(Settings.getInstance().getNumberFormat().format(Double.parseDouble(quantity.get()) * Double.parseDouble(price.get())));
         }
 
         public StringProperty totalProperty() {
-            return new SimpleStringProperty(new DecimalFormat(decimalFormat).format(Double.parseDouble(quantity.get()) * Double.parseDouble(price.get())));
+            return new SimpleStringProperty(Settings.getInstance().getNumberFormat().format(Double.parseDouble(quantity.get()) * Double.parseDouble(price.get())));
         }
 
         @Override

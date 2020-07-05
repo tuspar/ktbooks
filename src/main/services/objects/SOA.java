@@ -2,6 +2,7 @@ package main.services.objects;
 
 import com.spire.doc.FileFormat;
 import com.spire.doc.Table;
+import main.services.backend.Settings;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -9,10 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class SOA {
-
-    private static final String SOA_PERSONAL_DOCX = "assets/soaPersonal.docx";
-    private static final String SOA_NOMINAL_DOCX = "assets/soaNominal.docx";
-    private static final String decimalFormat = "#0.00";
+    private static final DecimalFormat decimalFormat = Settings.getInstance().getNumberFormat();
 
     public static void accountReport(Account account, boolean unpaidOnly, boolean balance, String notes, LocalDate start, LocalDate end, String path, FileFormat ext) {
         ArrayList<SOAItem> items = new ArrayList<>();
@@ -27,14 +25,17 @@ public class SOA {
         int receiptCount = Receipt.getCount() + 1;
         for (int i = 100; i < receiptCount; i++) {
             Receipt receipt = Receipt.load(i);
-            if (receipt.getAccount().getId() == account.getId() && !receipt.isDeleted() && !unpaidOnly) {
+            if (receipt.getCredit().getId() == account.getId() && !receipt.isDeleted() && !unpaidOnly) {
                 items.add(new SOAItem(receipt.getDate(), "Receipt " + receipt.getId(), "", receipt.getTotal()));
+            }
+            if (receipt.getDebit().getId() == account.getId() && !receipt.isDeleted() && !unpaidOnly) {
+                items.add(new SOAItem(receipt.getDate(), "Receipt " + receipt.getId(), receipt.getTotal(), ""));
             }
         }
         int purchaseCount = Expense.getCount() + 1;
         for (int i = 100; i < purchaseCount; i++) {
             Expense expense = Expense.load(i);
-            if (expense.getAccount().getId() == account.getId() && !expense.isDeleted() && !unpaidOnly) {
+            if (expense.getDebit().getId() == account.getId() && !expense.isDeleted() && !unpaidOnly) {
                 items.add(new SOAItem(expense.getDate(), "Expense " + expense.getId(), expense.getAmount(), expense.getAmount()));
             }
         }
@@ -43,8 +44,8 @@ public class SOA {
 
         com.spire.doc.Document format = new com.spire.doc.Document();
 
-        if (account.getType().equals(Account.PersonalType.CUSTOMER) || account.getType().equals(Account.PersonalType.SUPPLIER)) {
-            format.loadFromFile(SOA_PERSONAL_DOCX);
+        if (account.getType().equals(Account.AccountType.CUSTOMER) || account.getType().equals(Account.AccountType.SUPPLIER)) {
+            format.loadFromFile(Settings.Template.SOA_PERSONAL.getPath());
             format.replace("#company_name", account.getCompany(), true, true);
             format.replace("#company_address", account.getAddress(), true, true);
             format.replace("#company_tel", account.getPhone(), true, true);
@@ -53,7 +54,7 @@ public class SOA {
             format.replace("#end_date", end.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), true, true);
             format.replace("#notes", notes, true, true);
         } else {
-            format.loadFromFile(SOA_NOMINAL_DOCX);
+            format.loadFromFile(Settings.Template.SOA_NOMINAL.getPath());
             format.replace("#account_name", account.getCompany(), true, true);
             format.replace("#account_notes", account.getNotes(), true, true);
             format.replace("#start_date", start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), true, true);
@@ -77,7 +78,7 @@ public class SOA {
         ArrayList<SOAItem> sorted = cleanItems(items, start, end, balance);
 
         com.spire.doc.Document format = new com.spire.doc.Document();
-        format.loadFromFile(SOA_NOMINAL_DOCX);
+        format.loadFromFile(Settings.Template.SOA_NOMINAL.getPath());
         format.replace("#account_name", "Sales", true, true);
         format.replace("#account_notes", "", true, true);
         format.replace("#start_date", start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), true, true);
@@ -92,16 +93,16 @@ public class SOA {
         int expenseCount = Expense.getCount() + 1;
         for (int i = 100; i < expenseCount; i++) {
             Expense expense = Expense.load(i);
-            if (!expense.isDeleted() && expense.getAccount().getType().equals(Account.PersonalType.SUPPLIER)) {
+            if (!expense.isDeleted() && expense.getDebit().getType().equals(Account.AccountType.SUPPLIER)) {
                 items.add(new SOAItem(expense.getDate(), "Purchase " + expense.getId() + ": " + expense
-                        .getAccount().getCompany(), expense.getAmount(), ""));
+                        .getDebit().getCompany(), expense.getAmount(), ""));
             }
         }
 
         ArrayList<SOAItem> sorted = cleanItems(items, start, end, balance);
 
         com.spire.doc.Document format = new com.spire.doc.Document();
-        format.loadFromFile(SOA_NOMINAL_DOCX);
+        format.loadFromFile(Settings.Template.SOA_NOMINAL.getPath());
         format.replace("#account_name", "Purchases", true, true);
         format.replace("#account_notes", "Expenses filled under all supplier accounts", true, true);
         format.replace("#start_date", start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), true, true);
@@ -114,30 +115,38 @@ public class SOA {
     private static void itemPrinter(com.spire.doc.Document format, ArrayList<SOAItem> sorted, String path, FileFormat ext) {
         Table table = format.getSections().get(0).getTables().get(0);
         int rowsFromStart = 6;
-        System.out.println(table.getRows().getCount());
-        for (int i = 0; i < sorted.size() - 1; i++) {
+        for (int i = 0; i < sorted.size(); i++) {
             table.getRows().insert(rowsFromStart + i, table.getRows().get(6).deepClone());
         }
         double runningTotal = 0;
+        double debit = 0;
+        double credit = 0;
         for (int r = 0; r < sorted.size(); r++) {
             SOAItem item = sorted.get(r);
             if (!item.getDebit().isEmpty()) {
-                runningTotal += Double.parseDouble(item.getDebit());
+                double j = Double.parseDouble(item.getDebit());
+                debit += j;
+                runningTotal += j;
             }
             if (!item.getCredit().isEmpty()) {
-                runningTotal -= Double.parseDouble(item.getCredit());
+                double j = Double.parseDouble(item.getCredit());
+                credit += j;
+                runningTotal -= j;
             }
             table.getRows().get(r + rowsFromStart).getCells().get(0).getParagraphs().get(0).setText(item.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             table.getRows().get(r + rowsFromStart).getCells().get(1).getParagraphs().get(0).setText(item.getDescription());
             if (!item.getDebit().isEmpty()) {
-                table.getRows().get(r + rowsFromStart).getCells().get(2).getParagraphs().get(0).setText(new DecimalFormat(decimalFormat).format(Double.parseDouble(item.getDebit())));
+                table.getRows().get(r + rowsFromStart).getCells().get(2).getParagraphs().get(0).setText(decimalFormat.format(Double.parseDouble(item.getDebit())));
             }
             if (!item.getCredit().isEmpty()) {
-                table.getRows().get(r + rowsFromStart).getCells().get(3).getParagraphs().get(0).setText(new DecimalFormat(decimalFormat).format(Double.parseDouble(item.getCredit())));
+                table.getRows().get(r + rowsFromStart).getCells().get(3).getParagraphs().get(0).setText(decimalFormat.format(Double.parseDouble(item.getCredit())));
             }
-            table.getRows().get(r + rowsFromStart).getCells().get(4).getParagraphs().get(0).setText(new DecimalFormat(decimalFormat).format(runningTotal));
+            table.getRows().get(r + rowsFromStart).getCells().get(4).getParagraphs().get(0).setText(decimalFormat.format(runningTotal));
         }
-
+        table.getRows().get(rowsFromStart + sorted.size()).getCells().get(1).getParagraphs().get(0).setText("Balance c/d");
+        table.getRows().get(rowsFromStart + sorted.size()).getCells().get(2).getParagraphs().get(0).setText(decimalFormat.format(debit));
+        table.getRows().get(rowsFromStart + sorted.size()).getCells().get(3).getParagraphs().get(0).setText(decimalFormat.format(credit));
+        table.getRows().get(rowsFromStart + sorted.size()).getCells().get(4).getParagraphs().get(0).setText(decimalFormat.format(runningTotal));
         format.saveToFile(path, ext);
     }
 
@@ -173,8 +182,8 @@ public class SOA {
         boolean sorted = false;
         if (items.size() > 1) {
             while (!sorted) {
+                sorted = true;
                 for (int i = 0; i < items.size() - 1; i++) {
-                    sorted = true;
                     if (items.get(i).getDate().isAfter(items.get(i + 1).getDate())) {
                         SOAItem temp = items.get(i);
                         items.set(i, items.get(i + 1));

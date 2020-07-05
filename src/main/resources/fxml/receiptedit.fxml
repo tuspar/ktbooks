@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="726.0" prefWidth="649.0"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="800.0" prefWidth="649.0"
             xmlns="http://javafx.com/javafx/9.0.1" fx:controller="main.controllers.editors.ReceiptEditController">
     <children>
         <VBox layoutX="252.0" layoutY="193.0" prefHeight="644.0" prefWidth="547.0" AnchorPane.bottomAnchor="0.0"
@@ -26,13 +26,13 @@
                 </HBox>
                 <HBox prefHeight="100.0" prefWidth="200.0">
                     <children>
-                        <JFXDatePicker fx:id="dateField" prefHeight="28.0" prefWidth="244.0" promptText="Date">
+                        <JFXDatePicker fx:id="dateField" prefHeight="28.0" prefWidth="244.0" promptText="Date*">
                             <HBox.margin>
                                 <Insets bottom="25.0" left="25.0" right="10.0" top="25.0"/>
                             </HBox.margin>
                         </JFXDatePicker>
                         <JFXTextField fx:id="idField" disable="true" editable="false" labelFloat="true"
-                                      prefHeight="25.0" prefWidth="102.0" promptText="ID">
+                                      prefHeight="25.0" prefWidth="102.0" promptText="ID*">
                             <HBox.margin>
                                 <Insets bottom="25.0" left="25.0" right="10.0" top="25.0"/>
                             </HBox.margin>
@@ -41,21 +41,42 @@
                 </HBox>
                 <HBox alignment="CENTER" prefHeight="64.0" prefWidth="573.0">
                     <children>
-                        <JFXTextField fx:id="customerIdField" disable="true" editable="false" labelFloat="true"
-                                      prefHeight="25.0" prefWidth="102.0" promptText="Customer ID">
+                        <JFXTextField fx:id="customerIdField" editable="false" labelFloat="true" prefHeight="25.0"
+                                      prefWidth="102.0" promptText="Customer ID*">
                             <HBox.margin>
-                                <Insets bottom="25.0" left="25.0" right="25.0"/>
+                                <Insets bottom="12.5" left="25.0" right="25.0" top="12.5"/>
                             </HBox.margin>
                         </JFXTextField>
                         <JFXTextField fx:id="companyField" disable="true" editable="false" labelFloat="true"
                                       prefHeight="25.0" prefWidth="286.0" promptText="Customer" HBox.hgrow="ALWAYS">
                             <HBox.margin>
-                                <Insets bottom="25.0" left="25.0" right="25.0"/>
+                                <Insets bottom="12.5" right="25.0" top="12.5"/>
                             </HBox.margin>
                         </JFXTextField>
                         <Button mnemonicParsing="false" onAction="#addCustomerAction" text="Add Customer">
                             <HBox.margin>
-                                <Insets bottom="25.0" left="25.0" right="25.0"/>
+                                <Insets bottom="12.5" left="25.0" right="25.0" top="12.5"/>
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" layoutX="10.0" layoutY="188.0" prefHeight="64.0" prefWidth="573.0">
+                    <children>
+                        <JFXTextField fx:id="receiverIdField" editable="false" labelFloat="true" prefHeight="25.0"
+                                      prefWidth="102.0" promptText="Receiver ID*">
+                            <HBox.margin>
+                                <Insets bottom="12.5" left="25.0" top="12.5"/>
+                            </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="recieverField" disable="true" editable="false" labelFloat="true"
+                                      prefHeight="25.0" prefWidth="286.0" promptText="Receiver" HBox.hgrow="ALWAYS">
+                            <HBox.margin>
+                                <Insets bottom="12.5" left="25.0" right="25.0" top="12.5"/>
+                            </HBox.margin>
+                        </JFXTextField>
+                        <Button mnemonicParsing="false" onAction="#addReceiverAction" text="Add Receiver">
+                            <HBox.margin>
+                                <Insets bottom="12.5" left="25.0" right="25.0" top="12.5"/>
                             </HBox.margin>
                         </Button>
                     </children>
@@ -65,13 +86,13 @@
                         <JFXTextArea fx:id="descriptionField" labelFloat="true" prefHeight="117.0" prefWidth="581.0"
                                      promptText="Description">
                             <VBox.margin>
-                                <Insets bottom="25.0" left="25.0" right="25.0"/>
+                                <Insets bottom="25.0" left="25.0" right="25.0" top="15.0"/>
                             </VBox.margin>
                         </JFXTextArea>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                             <children>
                                 <JFXTextField fx:id="paidField" labelFloat="true" onAction="#amountChangeAction"
-                                              promptText="Paid Amount">
+                                              onKeyPressed="#amountChangeAction" promptText="Paid Amount*">
                                     <HBox.margin>
                                         <Insets bottom="25.0" left="25.0" right="25.0"/>
                                     </HBox.margin>
@@ -79,7 +100,7 @@
                                 <JFXTextField fx:id="selectedField" disable="true" editable="false" labelFloat="true"
                                               promptText="Selected Amount">
                                     <HBox.margin>
-                                        <Insets bottom="25.0" left="25.0" right="25.0"/>
+                                        <Insets bottom="25.0" right="25.0"/>
                                     </HBox.margin>
                                 </JFXTextField>
                             </children>
@@ -164,19 +185,26 @@
                                     </HBox.margin>
                                 </Button>
                                 <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteAction"
-                                        text="Delete"/>
+                                        text="Delete" visible="false"/>
+                                <JFXSpinner fx:id="loadingDocument" prefHeight="22.0" prefWidth="20.0" visible="false">
+                                    <HBox.margin>
+                                        <Insets left="10.0"/>
+                                    </HBox.margin>
+                                </JFXSpinner>
                             </children>
                         </HBox>
                         <HBox alignment="CENTER_RIGHT" layoutX="10.0" layoutY="10.0" prefHeight="61.0"
                               prefWidth="486.0">
                             <children>
-                                <Button fx:id="postButton" defaultButton="true" disable="true" mnemonicParsing="false"
+                                <JFXSpinner fx:id="postingDocument" prefHeight="22.0" prefWidth="20.0" visible="false"/>
+                                <Button fx:id="postButton" defaultButton="true" mnemonicParsing="false"
                                         onAction="#postReceipt" text="Post">
                                     <HBox.margin>
-                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+                                        <Insets bottom="15.0" left="15.0" top="15.0"/>
                                     </HBox.margin>
                                 </Button>
-                                <Button mnemonicParsing="false" onAction="#cancelAction" text="Cancel">
+                                <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelAction"
+                                        text="Cancel">
                                     <HBox.margin>
                                         <Insets bottom="15.0" left="15.0" right="25.0" top="15.0"/>
                                     </HBox.margin>

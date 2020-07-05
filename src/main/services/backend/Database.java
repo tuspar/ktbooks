@@ -3,7 +3,7 @@ package main.services.backend;
 import org.dizitart.no2.Nitrite;
 
 public class Database {
-    private static final String path = "main.db";
+    private static final String path = "data/data.db";
     private static Database dbc;
     private static Nitrite db;
 

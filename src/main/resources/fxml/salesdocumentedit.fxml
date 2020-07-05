@@ -87,7 +87,7 @@
                                         <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
                                     </VBox.margin>
                                 </JFXTextField>
-                                <JFXTextField fx:id="idField" disable="true" labelFloat="true" promptText="Invoice ID">
+                                <JFXTextField fx:id="idField" disable="true" labelFloat="true" promptText="ID">
                                     <VBox.margin>
                                         <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
                                     </VBox.margin>
@@ -96,12 +96,12 @@
                         </VBox>
                         <VBox prefHeight="81.0" prefWidth="188.0">
                             <children>
-                                <JFXTextField fx:id="ref1Field" labelFloat="true" promptText="REF1">
+                                <JFXTextField fx:id="ref1Field" labelFloat="true">
                                     <VBox.margin>
                                         <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
                                     </VBox.margin>
                                 </JFXTextField>
-                                <JFXTextField fx:id="ref2Field" labelFloat="true" promptText="REF2">
+                                <JFXTextField fx:id="ref2Field" labelFloat="true">
                                     <VBox.margin>
                                         <Insets bottom="14.0" left="7.0" right="7.0" top="14.0"/>
                                     </VBox.margin>

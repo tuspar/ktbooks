@@ -3,7 +3,7 @@ package main.services.objects;
 import com.spire.doc.FileFormat;
 import com.spire.doc.Table;
 import main.services.backend.Database;
-import org.controlsfx.control.Notifications;
+import main.services.backend.Settings;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.dizitart.no2.Document;
 import org.dizitart.no2.IndexType;
@@ -18,11 +18,11 @@ import org.dizitart.no2.objects.ObjectRepository;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.StringJoiner;
 
 import static org.dizitart.no2.objects.filters.ObjectFilters.eq;
 
@@ -30,16 +30,27 @@ import static org.dizitart.no2.objects.filters.ObjectFilters.eq;
         @Index(value = "id", type = IndexType.Unique)
 })
 public class Receipt implements Mappable {
-    private static final String RECEIPT_DOCX = "assets/receipt.docx";
-    private static final String decimalFormat = "#0.00";
     @Id
     private int id;
-    private Account account;
+    private Account credit, debit;
     private ArrayList<SalesDocument> paid = new ArrayList<>();
     private String description;
     private LocalDate date;
     private boolean deleted;
 
+    public static ArrayList<SalesDocument> getUnpaidBills(Account account) {
+        ArrayList<SalesDocument> unpaid = new ArrayList<>();
+        int count = SalesDocument.getCount(SalesDocument.SalesDocumentType.INVOICE);
+        for (int i = 100; i < count + 1; i++) {
+            SalesDocument document = SalesDocument.load(i, SalesDocument.SalesDocumentType.INVOICE);
+            if (document.getAccount().getId() == account.getId() && !document.isPaid() && !document.isDeleted()) {
+                unpaid.add(document);
+            }
+        }
+        return unpaid;
+    }
+
+    //Database Actions
     public static Receipt load(int id) {
         Nitrite db = Database.getInstance();
         ObjectRepository<Receipt> repo = db.getRepository(Receipt.class);
@@ -47,11 +58,15 @@ public class Receipt implements Mappable {
     }
 
     public static int getCount() {
-        for (int count = 100; true; count++) {
-            if (load(count) == null) {
-                return count - 1;
-            }
-        }
+        return Settings.getInstance().getCount(Receipt.class);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public static void delete(int id) {
@@ -63,31 +78,8 @@ public class Receipt implements Mappable {
         receipt.save();
     }
 
-    public static ArrayList<SalesDocument> getUnpaidBills(Account account) {
-        ArrayList<SalesDocument> unpaid = new ArrayList<>();
-        for (int i = 100; i < SalesDocument.getCount(SalesDocument.SalesDocumentType.INVOICE) + 1; i++) {
-            SalesDocument document = SalesDocument.load(i, SalesDocument.SalesDocumentType.INVOICE);
-            if (document.getAccount().getId() == account.getId() && !document.isPaid() && !document.isDeleted()) {
-                unpaid.add(document);
-            }
-        }
-        return unpaid;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
+    public Account getCredit() {
+        return credit;
     }
 
     public ArrayList<SalesDocument> getPaid() {
@@ -122,18 +114,25 @@ public class Receipt implements Mappable {
         this.deleted = deleted;
     }
 
-    //Database Actions
+    public void setCredit(Account credit) {
+        this.credit = credit;
+    }
+
+    public Account getDebit() {
+        return debit;
+    }
+
+    public void setDebit(Account debit) {
+        this.debit = debit;
+    }
+
     public void save() {
         Nitrite db = Database.getInstance();
         ObjectRepository<Receipt> repo = db.getRepository(Receipt.class);
         if (id > getCount()) {
             repo.insert(this);
-            Notifications.create().title("Saved Receipt")
-                    .text("Receipt " + id + " for " + account.getCompany() + " was successfully saved!").showInformation();
         } else {
             repo.update(eq("id", id), this);
-            Notifications.create().title("Updated Receipt")
-                    .text("Receipt " + id + " for " + account.getCompany() + " was successfully updated!").showInformation();
         }
     }
 
@@ -141,7 +140,8 @@ public class Receipt implements Mappable {
     public Document write(NitriteMapper nitriteMapper) {
         Document document = new Document();
         document.put("id", getId());
-        document.put("account", getAccount().write(nitriteMapper));
+        document.put("credit_id", getCredit().getId());
+        document.put("debit_id", getDebit().getId());
         document.put("description", getDescription());
         document.put("date", getDate());
         document.put("deleted", isDeleted());
@@ -158,10 +158,8 @@ public class Receipt implements Mappable {
     public void read(NitriteMapper nitriteMapper, Document document) {
         setId((Integer) document.get("id"));
 
-        Account account = new Account();
-        account.read(nitriteMapper, (Document) document.get("account"));
-        setAccount(account);
-
+        setCredit(Account.load((Integer) document.get("credit_id")));
+        setDebit(Account.load((Integer) document.get("debit_id")));
         setDescription((String) document.get("description"));
         setDate((LocalDate) document.get("date"));
         setDeleted((Boolean) document.get("deleted"));
@@ -176,11 +174,11 @@ public class Receipt implements Mappable {
 
     public void generateReceipt(String path, FileFormat ext) {
         com.spire.doc.Document format = new com.spire.doc.Document();
-        format.loadFromFile(RECEIPT_DOCX);
-        format.replace("#company_name", getAccount().getCompany(), true, true);
-        format.replace("#company_address", getAccount().getAddress(), true, true);
-        format.replace("#company_tel", getAccount().getPhone(), true, true);
-        format.replace("#company_trn", getAccount().getCompany(), true, true);
+        format.loadFromFile(Settings.Template.RECEIPT.getPath());
+        format.replace("#company_name", getCredit().getCompany(), true, true);
+        format.replace("#company_address", getCredit().getAddress(), true, true);
+        format.replace("#company_tel", getCredit().getPhone(), true, true);
+        format.replace("#company_trn", getCredit().getTrn(), true, true);
         format.replace("#doc_id", String.valueOf(getId()), true, true);
         format.replace("#doc_date", getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), true, true);
         format.replace("#description", getDescription(), true, true);
@@ -214,7 +212,7 @@ public class Receipt implements Mappable {
     }
 
     public String getCompany() {
-        return account.getCompany();
+        return credit.getCompany();
     }
 
     public String getTotal() {
@@ -222,6 +220,14 @@ public class Receipt implements Mappable {
         for (SalesDocument invoice : paid) {
             total += Double.parseDouble(invoice.getTotal());
         }
-        return new DecimalFormat(decimalFormat).format(total);
+        return Settings.getInstance().getNumberFormat().format(total);
+    }
+
+    public String getInvoices() {
+        StringJoiner invoices = new StringJoiner(", ");
+        for (SalesDocument invoice : this.paid) {
+            invoices.add(String.valueOf(invoice.getId()));
+        }
+        return invoices.toString();
     }
 }

@@ -1,6 +1,7 @@
 package main.services.objects;
 
 import main.services.backend.Database;
+import main.services.backend.Settings;
 import org.controlsfx.control.Notifications;
 import org.dizitart.no2.Document;
 import org.dizitart.no2.IndexType;
@@ -20,7 +21,7 @@ import static org.dizitart.no2.objects.filters.ObjectFilters.eq;
 public class Account implements Mappable {
     @Id
     private int id;
-    private PersonalType type;
+    private AccountType type;
     private String company;
     private String phone;
     private String address;
@@ -44,11 +45,7 @@ public class Account implements Mappable {
     }
 
     public static int getCount() {
-        for (int count = 100; true; count++) {
-            if (load(count) == null) {
-                return count - 1;
-            }
-        }
+        return Settings.getInstance().getCount(Account.class);
     }
 
     //Getters and Setters
@@ -60,11 +57,11 @@ public class Account implements Mappable {
         this.id = id;
     }
 
-    public PersonalType getType() {
+    public AccountType getType() {
         return type;
     }
 
-    public void setType(PersonalType type) {
+    public void setType(AccountType type) {
         this.type = type;
     }
 
@@ -173,7 +170,7 @@ public class Account implements Mappable {
     public void read(NitriteMapper nitriteMapper, Document document) {
         if (document != null) {
             setId((int) document.get("id"));
-            setType(PersonalType.valueOf(((String) document.get("type")).toUpperCase()));
+            setType(AccountType.valueOf(((String) document.get("type")).toUpperCase()));
             setCompany((String) document.get("company"));
             setPhone((String) document.get("phone"));
             setAddress((String) document.get("address"));
@@ -185,7 +182,7 @@ public class Account implements Mappable {
     }
 
     //Account Account Types
-    public enum PersonalType {
+    public enum AccountType {
         CUSTOMER("Customer"),
         SUPPLIER("Supplier"),
         EXPENSE("Expense"),
@@ -195,7 +192,7 @@ public class Account implements Mappable {
 
         private String label;
 
-        PersonalType(String label) {
+        AccountType(String label) {
             this.label = label;
         }
 

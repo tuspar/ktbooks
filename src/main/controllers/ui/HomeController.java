@@ -3,21 +3,13 @@ package main.controllers.ui;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
 import main.services.backend.DisplayInterface;
 import main.services.objects.Account;
 import main.services.objects.Expense;
 import main.services.objects.Receipt;
 import main.services.objects.SalesDocument;
-import org.controlsfx.control.Notifications;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URL;
-import java.nio.channels.FileChannel;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 public class HomeController implements Initializable {
@@ -27,34 +19,7 @@ public class HomeController implements Initializable {
 
     @FXML
     void settingsAction() {
-
-    }
-
-    @FXML
-    void saveBackupAction() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Backup");
-        fileChooser.setInitialFileName(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".db");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Database File", "*.db"));
-        File file = fileChooser.showSaveDialog(homeLabel.getScene().getWindow());
-        if (file != null) {
-            try {
-                FileChannel sfc = new RandomAccessFile("main.db", "r").getChannel();
-                FileChannel dfc = new RandomAccessFile(file, "rw").getChannel();
-
-                dfc.transferFrom(sfc, 0, sfc.size());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-        Notifications.create().title("Saved").text("Backup was Saved!").show();
-    }
-
-    @FXML
-    void importBackupAction() {
-
+        DisplayInterface.settings();
     }
 
     @FXML

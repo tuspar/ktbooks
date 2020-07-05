@@ -22,7 +22,6 @@ import main.services.backend.DisplayInterface;
 import main.services.objects.Account;
 import main.services.objects.Receipt;
 import main.services.objects.SalesDocument;
-import org.controlsfx.control.Notifications;
 import org.controlsfx.dialog.ExceptionDialog;
 
 import java.awt.*;
@@ -136,12 +135,14 @@ public class SalesDocumentEditController implements Initializable {
     public void setMode(SalesDocument.SalesDocumentType mode) {
         this.mode = mode;
         typeText.setText(mode.toString());
+        idField.setPromptText(mode.toString() + " ID");
         if (mode.equals(SalesDocument.SalesDocumentType.INVOICE)) {
             markPaid.setDisable(false);
         }
         String[] refs = SalesDocument.getRefs(mode);
         ref1Field.setPromptText(refs[0]);
         ref2Field.setPromptText(refs[1]);
+        idField.setText(String.valueOf(SalesDocument.getCount(mode) + 1));
     }
 
     public void setDocument(SalesDocument document) {
@@ -184,7 +185,16 @@ public class SalesDocumentEditController implements Initializable {
 
     @FXML
     private boolean verifyAction(ActionEvent actionEvent) {
-        return true;
+        if (customerIDField.getText().equals("")) {
+            DisplayInterface.confirmDialog("Error", "Please add a customer");
+            return false;
+        } else if (dateField.getValue() != null) {
+            DisplayInterface.confirmDialog("Error", "Please add a date");
+            return false;
+        } else {
+            DisplayInterface.notification("Verified", "Invoice " + idField.getText() + " was verified");
+            return true;
+        }
     }
 
     @FXML
@@ -192,8 +202,10 @@ public class SalesDocumentEditController implements Initializable {
         if (verifyAction(actionEvent)) {
             SalesDocument document = makeDocument();
             document.save();
-            if (document.getAccount().getCompany().toLowerCase().contains("cash") &&
-                    DisplayInterface.confirmDialog("Mark as Paid", "Invoice filed with account ")) {
+            DisplayInterface.notification("Saved", "Invoice " + idField.getText() + " was verified and posted");
+            if (document.getAccount().getType().equals(Account.AccountType.ASSET) &&
+                    DisplayInterface.confirmDialog("Mark as Paid", "Invoice filed with asset")) {
+                markPaidAction();
             }
         }
     }
@@ -201,27 +213,18 @@ public class SalesDocumentEditController implements Initializable {
     @FXML
     private void viewWordAction() {
         updateTable();
-        loadingBar.setVisible(true);
-        new Thread(() -> {
-            makeDocument().viewSalesDocument(FileFormat.Docx);
-            loadingBar.setVisible(false);
-        }).start();
+        DisplayInterface.loading(() -> makeDocument().viewSalesDocument(FileFormat.Docx), loadingBar);
     }
 
     @FXML
     private void viewPDFAction() {
         updateTable();
-        loadingBar.setVisible(true);
-        new Thread(() -> {
-            makeDocument().viewSalesDocument(FileFormat.PDF);
-            loadingBar.setVisible(false);
-        }).start();
+        DisplayInterface.loading(() -> makeDocument().viewSalesDocument(FileFormat.PDF), loadingBar);
     }
 
     @FXML
     private void saveAsAction(ActionEvent actionEvent) {
         updateTable();
-        loadingBar.setVisible(true);
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save " + mode);
         fileChooser.setInitialFileName(mode + " " + idField.getText());
@@ -229,25 +232,26 @@ public class SalesDocumentEditController implements Initializable {
                 new FileChooser.ExtensionFilter("Word Document", "*.docx"),
                 new FileChooser.ExtensionFilter("PDF", "*.pdf"));
         File file = fileChooser.showSaveDialog(table.getScene().getWindow());
-        new Thread(() -> {
-            if (file.getName().endsWith(".pdf")) {
-                try {
-                    makeDocument().generateSalesDocument(file.getAbsolutePath(), FileFormat.PDF);
-                    Desktop.getDesktop().open(file);
-                } catch (IOException e) {
-                    new ExceptionDialog(e).showAndWait();
+        if (file != null) {
+            DisplayInterface.loading(() -> {
+                if (file.getName().endsWith(".pdf")) {
+                    try {
+                        makeDocument().generateSalesDocument(file.getAbsolutePath(), FileFormat.PDF);
+                        Desktop.getDesktop().open(file);
+                    } catch (IOException e) {
+                        new ExceptionDialog(e).showAndWait();
+                    }
+                } else {
+                    try {
+                        makeDocument().generateSalesDocument(file.getAbsolutePath(), FileFormat.Docx);
+                        Desktop.getDesktop().open(file);
+                    } catch (IOException e) {
+                        new ExceptionDialog(e).showAndWait();
+                    }
                 }
-            } else {
-                try {
-                    makeDocument().generateSalesDocument(file.getAbsolutePath(), FileFormat.Docx);
-                    Desktop.getDesktop().open(file);
-                } catch (IOException e) {
-                    new ExceptionDialog(e).showAndWait();
-                }
-            }
-        }).start();
-        Notifications.create().title("Saved").text(file.getName() + " was Saved!").show();
-        loadingBar.setVisible(false);
+            }, loadingBar);
+        }
+        DisplayInterface.notification("Saved", file.getName() + " was saved");
     }
 
     @FXML
@@ -257,6 +261,7 @@ public class SalesDocumentEditController implements Initializable {
             customerIDField.setText(String.valueOf(account.getId()));
             companyField.setText(account.getCompany());
         }
+        updateTable();
     }
 
     @FXML
@@ -353,24 +358,30 @@ public class SalesDocumentEditController implements Initializable {
         if (table.getSelectionModel().getSelectedIndex() != -1) {
             table.getItems().remove(table.getSelectionModel().getSelectedIndex());
             updateTable();
+        } else {
+            DisplayInterface.confirmDialog(DisplayInterface.ConfirmType.SELECT_ROW);
         }
     }
 
     @FXML
     private void duplicateItemAction(ActionEvent actionEvent) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Duplicate Item");
-        dialog.setHeaderText("Enter number of copies needed:");
+        if (table.getSelectionModel().getSelectedIndex() != -1) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Duplicate Item");
+            dialog.setHeaderText("Enter number of copies needed:");
 
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
-            for (int i = 0; i < Integer.parseInt(result.get()); i++) {
-                SalesDocument.Item selectedItem = table.getSelectionModel().getSelectedItem();
-                SalesDocument.Item duplicateItem = new SalesDocument.Item("0", selectedItem.getDescription(),
-                        selectedItem.getQuantity(), selectedItem.getUom(), selectedItem.getPrice(), null);
-                table.getItems().add(duplicateItem);
-                updateTable();
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                for (int i = 0; i < Integer.parseInt(result.get()); i++) {
+                    SalesDocument.Item selectedItem = table.getSelectionModel().getSelectedItem();
+                    SalesDocument.Item duplicateItem = new SalesDocument.Item("0", selectedItem.getDescription(),
+                            selectedItem.getQuantity(), selectedItem.getUom(), selectedItem.getPrice(), null);
+                    table.getItems().add(duplicateItem);
+                    updateTable();
+                }
             }
+        } else {
+            DisplayInterface.confirmDialog(DisplayInterface.ConfirmType.SELECT_ROW);
         }
     }
 
@@ -387,14 +398,14 @@ public class SalesDocumentEditController implements Initializable {
             Receipt receipt = new Receipt();
             receipt.setId(Receipt.getCount() + 1);
             receipt.setDeleted(false);
-            receipt.setAccount(document.getAccount());
+            receipt.setCredit(document.getAccount());
             receipt.setDate(document.getDate());
             receipt.setDescription("Auto generated sales receipt for Sales Invoice " + idField.getText());
             receipt.setPaid(paid);
-            receipt.save();
-            document.setPaid(true);
-            document.save();
-            markPaid.setDisable(true);
+            DisplayInterface.loadReceipt(receipt);
+            if (SalesDocument.load(Integer.parseInt(idField.getText()), mode).isPaid()) {
+                markPaid.setDisable(true);
+            }
         } else {
             DisplayInterface.confirmDialog("Unsaved Invoice", "Save the invoice before marking as paid");
         }
@@ -436,16 +447,22 @@ public class SalesDocumentEditController implements Initializable {
         document.setRef1(ref1Field.getText());
         document.setRef2(ref2Field.getText());
         document.setDeleted(false);
+        document.setPaid(markPaid.isDisable());
         try {
             if (!customerIDField.getText().equals("")) {
                 Account customer = Account.load(Integer.parseInt(customerIDField.getText()));
                 document.setAccount(customer);
+                if (customer.getType().equals(Account.AccountType.ASSET) || customer.getType().equals(Account.AccountType.LIABILITY)) {
+                    document.setPaid(true);
+                    markPaid.setDisable(true);
+                } else {
+                    markPaid.setDisable(false);
+                }
             }
         } catch (Exception e) {
             new ExceptionDialog(e).showAndWait();
         }
         document.setDate(dateField.getValue());
-        document.setPaid(markPaid.isDisable());
         document.setType(mode);
         return document;
     }
@@ -455,7 +472,6 @@ public class SalesDocumentEditController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         table.setItems(document.getItems());
 
-        //Actual
         noColumn.setCellValueFactory(new PropertyValueFactory<>("no"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));

@@ -1,9 +1,6 @@
 package main.controllers.editors;
 
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDatePicker;
-import com.jfoenix.controls.JFXTextArea;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import com.spire.doc.FileFormat;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,7 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import main.controllers.ui.ObjectViewerController;
 import main.services.backend.DisplayInterface;
 import main.services.objects.Account;
@@ -62,6 +58,9 @@ public class SOAController implements Initializable {
     private JFXTextArea noteField;
 
     @FXML
+    private JFXSpinner loading;
+
+    @FXML
     void cancelAction(ActionEvent event) {
         DisplayInterface.exit(event);
     }
@@ -89,51 +88,55 @@ public class SOAController implements Initializable {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Word Document", "*.docx"),
                 new FileChooser.ExtensionFilter("PDF", "*.pdf"));
-        File file = fileChooser.showSaveDialog(((Stage) ((Node) event.getSource()).getScene().getWindow()));
-        if (file.getName().endsWith(".pdf")) {
-            try {
-                save(file.getAbsolutePath(), FileFormat.PDF);
-                Desktop.getDesktop().open(file);
-            } catch (IOException e) {
-                new ExceptionDialog(e).showAndWait();
-            }
-        } else {
-            try {
-                save(file.getAbsolutePath(), FileFormat.Docx);
-                Desktop.getDesktop().open(file);
-            } catch (IOException e) {
-                new ExceptionDialog(e).showAndWait();
-            }
+        File file = fileChooser.showSaveDialog(((Node) event.getSource()).getScene().getWindow());
+        if (file != null) {
+            DisplayInterface.loading(() -> {
+                if (file.getName().endsWith(".pdf")) {
+                    try {
+                        save(file.getAbsolutePath(), FileFormat.PDF);
+                        Desktop.getDesktop().open(file);
+                    } catch (IOException e) {
+                        new ExceptionDialog(e).showAndWait();
+                    }
+                } else {
+                    try {
+                        save(file.getAbsolutePath(), FileFormat.Docx);
+                        Desktop.getDesktop().open(file);
+                    } catch (IOException e) {
+                        new ExceptionDialog(e).showAndWait();
+                    }
+                }
+            }, loading);
+            Notifications.create().title("Saved").text(file.getName() + " was Saved!").show();
         }
-        Notifications.create().title("Saved").text(file.getName() + " was Saved!").show();
-
-
     }
 
     @FXML
     void viewPDFAction() {
-        String path = new Random().nextInt() + "." + FileFormat.PDF.toString().toLowerCase();
-        save(path, FileFormat.PDF);
-        try {
-            Desktop.getDesktop().open(new File(path));
-        } catch (IOException e) {
-            new ExceptionDialog(e).showAndWait();
-        }
-        new File(path).deleteOnExit();
-
+        DisplayInterface.loading(() -> {
+            String path = new Random().nextInt() + "." + FileFormat.PDF.toString().toLowerCase();
+            save(path, FileFormat.PDF);
+            try {
+                Desktop.getDesktop().open(new File(path));
+            } catch (IOException e) {
+                new ExceptionDialog(e).showAndWait();
+            }
+            new File(path).deleteOnExit();
+        }, loading);
     }
 
     @FXML
     void viewWordAction() {
-        String path = new Random().nextInt() + "." + FileFormat.Docx.toString().toLowerCase();
-        save(path, FileFormat.Docx);
-        try {
-            Desktop.getDesktop().open(new File(path));
-        } catch (IOException e) {
-            new ExceptionDialog(e).showAndWait();
-        }
-        new File(path).deleteOnExit();
-
+        DisplayInterface.loading(() -> {
+            String path = new Random().nextInt() + "." + FileFormat.Docx.toString().toLowerCase();
+            save(path, FileFormat.Docx);
+            try {
+                Desktop.getDesktop().open(new File(path));
+            } catch (IOException e) {
+                new ExceptionDialog(e).showAndWait();
+            }
+            new File(path).deleteOnExit();
+        }, loading);
     }
 
     @FXML
@@ -157,15 +160,13 @@ public class SOAController implements Initializable {
     @FXML
     void addAction() {
         String type = typeSelector.getValue();
-        switch (type) {
-            case "Account":
-                Account account = (Account) DisplayInterface.selectObject(ObjectViewerController.
-                        ViewerMode.ALL_ACCOUNTS, ObjectViewerController.ViewerMode.ALL_ACCOUNTS);
-                if (account != null) {
-                    idField.setText(String.valueOf(account.getId()));
-                    nameField.setText(account.getType() + ": " + account.getCompany());
-                }
-                break;
+        if (type.equals("Account")) {
+            Account account = (Account) DisplayInterface.selectObject(ObjectViewerController.
+                    ViewerMode.ALL_ACCOUNTS, ObjectViewerController.ViewerMode.ALL_ACCOUNTS);
+            if (account != null) {
+                idField.setText(String.valueOf(account.getId()));
+                nameField.setText(account.getType() + ": " + account.getCompany());
+            }
         }
     }
 

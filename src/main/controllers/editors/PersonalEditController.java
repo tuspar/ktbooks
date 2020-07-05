@@ -33,7 +33,7 @@ public class PersonalEditController implements Initializable {
     private JFXTextField idField;
 
     @FXML
-    private JFXComboBox<Account.PersonalType> typeComboBox;
+    private JFXComboBox<Account.AccountType> typeComboBox;
 
     @FXML
     private JFXTextArea notesField;
@@ -76,7 +76,7 @@ public class PersonalEditController implements Initializable {
         }
     }
 
-    Account makeDocument() {
+    private Account makeDocument() {
         Account document = new Account();
         document.setCompany(companyField.getText());
         document.setPhone(phoneField.getText());
@@ -92,7 +92,7 @@ public class PersonalEditController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        typeComboBox.getItems().addAll(Account.PersonalType.CUSTOMER, Account.PersonalType.SUPPLIER);
+        typeComboBox.getItems().addAll(Account.AccountType.CUSTOMER, Account.AccountType.SUPPLIER);
         idField.setText(String.valueOf(Account.getCount() + 1));
         deleteButton.setVisible(false);
     }
