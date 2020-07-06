@@ -23,8 +23,6 @@ import static org.dizitart.no2.objects.filters.ObjectFilters.eq;
 })
 public class Settings {
     public static final String VERSION = "3.0";
-    private static final String clientId = "909796955980-j0jrlgqe6i28ujv1fc8fabl56jci1oic.apps.googleusercontent.com";
-    private static final String clientSecret = "iIA90suhRl1zLg9YSRz2lC0B";
     private static Settings settings;
     //Google Drive Settings
     private boolean driveBackupStatus;
